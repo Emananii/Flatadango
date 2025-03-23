@@ -62,7 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     //Handle ticket purchase
-    buyTicketButton.addEventListener("click", () => {
+    buyTicketButton.addEventListener("click", (event) => {
+        event.preventDefault();
         if (selectedMovie && selectedMovie.tickets_sold < selectedMovie.capacity) {
             selectedMovie.tickets_sold++;
             updateAvailableTickets(); // Update ticket count in UI
