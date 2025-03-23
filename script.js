@@ -72,8 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Handle ticket purchase
     buyTicketButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+        event.preventDefault();//testing to see if it'll prevent page reload
+        event.stopPropagation();//testing to see if it'll prevent page reload
         console.log("Buy Ticket button clicked!"); 
         if (selectedMovie && selectedMovie.tickets_sold < selectedMovie.capacity) {
             selectedMovie.tickets_sold++;
