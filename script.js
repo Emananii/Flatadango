@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const movieTickets = document.getElementById("movie-tickets");
     const buyTicketButton = document.getElementById("buy-ticket");
 
-    const dbUrl = "http://localhost:3000/films"; // URL for fetching data from db.json
+    const dbUrl = "http://localhost:3000/films";
 
     let selectedMovie = null; // Stores the currently selected movie
 
@@ -18,14 +18,19 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(movies => {
                 filmsList.innerHTML = ""; // Clear any existing movies
                 movies.forEach(movie => displayMovieInList(movie));
-                // Select the first movie by default
-                if (movies.length > 0) {
+    
+                // Restore last selected movie if it exists
+                const lastMovieId = localStorage.getItem("selectedMovieId");
+                const lastMovie = movies.find(movie => movie.id == lastMovieId);
+    
+                if (lastMovie) {
+                    loadMovieDetails(lastMovie);
+                } else if (movies.length > 0) {
                     loadMovieDetails(movies[0]);
                 }
             })
             .catch(error => console.error("Error fetching movies:", error));
     }
-
     //Display each movie title in the aside list
     function displayMovieInList(movie) {
         const li = document.createElement("li");
@@ -37,16 +42,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Load the movie details when a movie is clicked
     function loadMovieDetails(movie) {
+        console.log("Loading movie details:", movie);
         selectedMovie = movie;
+        localStorage.setItem("selectedMovieId", movie.id); // Store in localStorage
+    
         movieTitle.textContent = movie.title;
         moviePoster.src = movie.poster;
         movieRuntime.textContent = `Runtime: ${movie.runtime} mins`;
         movieShowtime.textContent = `Showtime: ${movie.showtime}`;
-        updateAvailableTickets(); // Update ticket availability
+        updateAvailableTickets();
     }
 
     //Update available tickets
     function updateAvailableTickets() {
+        console.log("Updating available tickets...");
         if (selectedMovie) {
             let availableTickets = selectedMovie.capacity - selectedMovie.tickets_sold;
             movieTickets.textContent = `Available Tickets: ${availableTickets}`;
@@ -64,8 +73,12 @@ document.addEventListener("DOMContentLoaded", () => {
     //Handle ticket purchase
     buyTicketButton.addEventListener("click", (event) => {
         event.preventDefault();
+        event.stopPropagation();
+        console.log("Buy Ticket button clicked!"); 
         if (selectedMovie && selectedMovie.tickets_sold < selectedMovie.capacity) {
             selectedMovie.tickets_sold++;
+
+            console.log("Tickets sold updated:", selectedMovie.tickets_sold);
             updateAvailableTickets(); // Update ticket count in UI
 
             // (Optional) Send updated data back to the server (if using JSON Server)
@@ -80,8 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch(error => console.error("Error updating ticket count:", error));
         }
+        
     });
 
     //Load movies when the page is ready
     fetchMovies();
+    
 });
