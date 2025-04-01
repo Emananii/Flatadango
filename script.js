@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+    //creating global variables for all the DOM elements I'll need
     const filmsList = document.getElementById("films");
     const movieTitle = document.getElementById("movie-title");
     const moviePoster = document.getElementById("movie-poster");
@@ -7,19 +9,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const movieTickets = document.getElementById("movie-tickets");
     const buyTicketButton = document.getElementById("buy-ticket");
 
-    const dbUrl = "http://localhost:3000/films";
+    const url = "http://localhost:8000/films";//specified the films endpoint to fix error
 
-    let selectedMovie = null; // Stores the currently selected movie
+    let selectedMovie; // Stores the currently selected movie
 
     //Fetch movies from db.json and display them in the movie list
     function fetchMovies() {
-        fetch(dbUrl)
+        fetch(url)
             .then(response => response.json())
             .then(movies => {
-                filmsList.innerHTML = ""; // Clear any existing movies
                 movies.forEach(movie => displayMovieInList(movie));
     
-                // Restore last selected movie if it exists
+                // We will restore last selected movie if it exists
                 const lastMovieId = localStorage.getItem("selectedMovieId");
                 const lastMovie = movies.find(movie => movie.id == lastMovieId);
     
@@ -31,19 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch(error => console.error("Error fetching movies:", error));
     }
-    //Display each movie title in the aside list
+    //Displaying each movie title in the aside list
     function displayMovieInList(movie) {
         const li = document.createElement("li");
         li.textContent = movie.title;
         li.classList.add("film-item"); // Adding a class for styling
-        li.addEventListener("click", () => loadMovieDetails(movie)); // When clicked, load details
+        li.addEventListener("click", () => loadMovieDetails(movie)); // When the list item is clicked, this will load details
         filmsList.appendChild(li);
     }
 
-    //Load the movie details when a movie is clicked
+    //a function to Load the movie details when a movie is clicked
     function loadMovieDetails(movie) {
-        console.log("Loading movie details:", movie);
-        selectedMovie = movie;
+        console.log("Loading movie details:", movie);//my debugger
+        selectedMovie = movie;//the argument passed here is the movie that was clicked
         localStorage.setItem("selectedMovieId", movie.id); // Store in localStorage
     
         movieTitle.textContent = movie.title;
@@ -53,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateAvailableTickets();
     }
 
-    //Update available tickets
+    //Updating available tickets
     function updateAvailableTickets() {
         console.log("Updating available tickets...");
         if (selectedMovie) {
@@ -70,11 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    //Handle ticket purchase
+    //Handling ticket purchase
     buyTicketButton.addEventListener("click", (event) => {
-        event.preventDefault();//testing to see if it'll prevent page reload
+        event.preventDefault();//not a form but testing to see if it'll prevent page reload
         event.stopPropagation();//testing to see if it'll prevent page reload
-        console.log("Buy Ticket button clicked!"); 
+        console.log("Buy Ticket button clicked!"); //debugger
         if (selectedMovie && selectedMovie.tickets_sold < selectedMovie.capacity) {
             selectedMovie.tickets_sold++;
 
@@ -82,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateAvailableTickets(); // Update ticket count in UI
 
             // (Optional) Send updated data back to the server (if using JSON Server)
-            fetch(`${dbUrl}/${selectedMovie.id}`, {
+            fetch(`${url}/${selectedMovie.id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ tickets_sold: selectedMovie.tickets_sold })
@@ -96,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
     });
 
-    //Load movies when the page is ready
+    //Load movies once the page is ready
     fetchMovies();
     
 });
