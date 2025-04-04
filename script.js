@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const movieTickets = document.getElementById("movie-tickets");
     const buyTicketButton = document.getElementById("buy-ticket");
 
-    const url = "http://localhost:8000/films";//specified the films endpoint to fix error
+    const url = "https://flatadango-json-server-api.onrender.com/films";//specified the films endpoint to fix error
 
     let selectedMovie; // Stores the currently selected movie
 
